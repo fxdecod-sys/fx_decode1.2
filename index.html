@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FX DECOD — MVP</title>
+
+  <!-- Cairo font -->
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN for quick MVP -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandBlue: '#00AFFF',
+            brandGreen: '#00FF66',
+            slate950: '#061226'
+          },
+          fontFamily: {
+            cairo: ['Cairo', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: Cairo, sans-serif; background: #050916; }
+    /* Logo gradient */
+    .decod-gradient {
+      background: linear-gradient(90deg, #00AFFF 0%, #00FF66 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+  </style>
+</head>
+<body class="min-h-screen text-slate-200">
+
+  <header class="px-6 py-4 flex items-center justify-between bg-slate-950/60">
+    <div class="flex items-center gap-3">
+      <div class="text-white font-black text-2xl tracking-tight" style="direction:ltr;">
+        <span style="color:white">FX</span><span class="decod-gradient">Decod</span>
+      </div>
+      <div class="ml-4 text-sm text-slate-400">AI Connected <span class="inline-block w-2 h-2 bg-green-400 rounded-full animate-pulse ml-2"></span></div>
+    </div>
+
+    <!-- Ticker placeholder -->
+    <div class="hidden md:block" style="min-width:40%">
+      <!-- TradingView ticker-tape -->
+      <div class="tradingview-widget-container">
+        <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+        <script type="text/javascript">
+        new TradingView.MediumWidget({
+          "symbols": [
+            ["Gold","OANDA:XAUUSD"],
+            ["EURUSD","OANDA:EURUSD"],
+            ["BTCUSD","COINBASE:BTCUSD"],
+            ["USOIL","TVC:USOIL"]
+          ],
+          "chartOnly": false,
+          "width": "100%",
+          "height": 28,
+          "locale": "en",
+          "colorTheme": "dark",
+          "isTransparent": true,
+          "autosize": true
+        });
+        </script>
+      </div>
+    </div>
+  </header>
+
+  <main class="p-6 max-w-6xl mx-auto">
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Control Panel -->
+      <div class="col-span-1 bg-slate-900 p-4 rounded-2xl shadow-lg">
+        <h3 class="text-lg font-bold mb-3">لوحة التحكم</h3>
+        <label class="block mb-2">الرمز / الزوج</label>
+        <select id="symbol" class="w-full p-2 bg-slate-800 rounded">
+          <option value="OANDA:XAUUSD">XAUUSD — ذهب</option>
+          <option value="OANDA:WTICOUSD">USOIL — نفط WTI</option>
+          <option value="OANDA:BRENT">Brent — نفط</option>
+          <option value="OANDA:EURUSD">EURUSD</option>
+          <option value="COINBASE:BTCUSD">BTCUSD</option>
+        </select>
+
+        <label class="block mt-3">سعر الدخول (Entry)</label>
+        <input id="entry" type="number" class="w-full p-2 bg-slate-800 rounded" step="0.01" placeholder="مثال: 1950.12">
+
+        <label class="block mt-3">وقف الخسارة (Stop)</label>
+        <input id="stop" type="number" class="w-full p-2 bg-slate-800 rounded" step="0.01" placeholder="مثال: 1935.00">
+
+        <button id="analyzeBtn" class="mt-4 w-full py-2 rounded bg-brandBlue text-black font-bold">ابدأ التحليل الذكي</button>
+      </div>
+
+      <!-- TradingView Chart -->
+      <div class="lg:col-span-2 bg-slate-900 p-4 rounded-2xl shadow-lg">
+        <div id="tv_chart" class="w-full h-96"></div>
+        <script type="text/javascript">
+          // load chart with default symbol
+          function loadTV(symbol){
+            document.getElementById('tv_chart').innerHTML = '';
+            new TradingView.widget({
+              "width": "100%",
+              "height": 520,
+              "symbol": symbol,
+              "interval": "60",
+              "timezone": "Etc/UTC",
+              "theme": "dark",
+              "style": "1",
+              "locale": "en",
+              "enable_publishing": false,
+              "container_id": "tv_chart"
+            });
+          }
+          // initial
+          loadTV(document.getElementById('symbol').value);
+          // change on select
+          document.getElementById('symbol').addEventListener('change', e => loadTV(e.target.value));
+        </script>
+      </div>
+    </section>
+
+    <!-- Results area -->
+    <section class="mt-6" id="resultsArea"></section>
+  </main>
+
+  <!-- Footer with social links -->
+  <footer class="py-6 bg-slate-950 text-center">
+    <div class="max-w-6xl mx-auto">
+      <div class="flex justify-center gap-6 mb-3">
+        <a href="https://t.me/fx_decode" target="_blank" class="p-2 rounded hover:text-white">Telegram</a>
+        <a href="https://www.youtube.com/@FX.Decodee" target="_blank" class="p-2 rounded hover:text-red-500">YouTube</a>
+        <a href="https://www.instagram.com/fx.decodee/" target="_blank" class="p-2 rounded hover:text-pink-400">Instagram</a>
+        <a href="https://www.tiktok.com/@fx.decodee" target="_blank" class="p-2 rounded hover:text-white">TikTok</a>
+      </div>
+      <div class="text-slate-400 text-sm">© FX Decod 2025 — Designed for demo</div>
+    </div>
+  </footer>
+
+  <!-- Analysis script (simple 1:1 rule) -->
+  <script>
+    document.getElementById('analyzeBtn').addEventListener('click', () => {
+      const entry = parseFloat(document.getElementById('entry').value);
+      const stop = parseFloat(document.getElementById('stop').value);
+      const symbol = document.getElementById('symbol').value;
+      if (!entry || !stop || entry === stop) {
+        alert('رجاءً عيّن سعر دخول ووقف خسارة صحيحين.');
+        return;
+      }
+      // 1:1 TP1 calculation
+      const tp1 = entry + (entry - stop);
+      const distance = Math.abs(entry - stop);
+      const confidence = Math.floor(Math.random()*21) + 70; // random 70-90 for demo
+
+      // render result card
+      const html = `
+      <div class="max-w-6xl mx-auto bg-slate-800 rounded-2xl p-4 mt-4">
+        <div class="flex items-center justify-between mb-3">
+          <div>
+            <div class="text-sm text-slate-300">توصية — ${symbol}</div>
+            <div class="text-2xl font-black ${entry>stop ? 'text-emerald-400' : 'text-rose-400'}">${entry>stop ? 'BUY' : 'SELL'}</div>
+          </div>
+          <div class="text-sm text-slate-400">ثقة النموذج: <span class="font-bold">${confidence}%</span></div>
+        </div>
+        <div class="grid grid-cols-3 gap-2 text-xs text-slate-300">
+          <div class="p-3 bg-slate-900 rounded">Entry<br><span class="font-bold text-lg">${entry.toFixed(2)}</span></div>
+          <div class="p-3 bg-slate-900 rounded">Stop<br><span class="font-bold text-lg">${stop.toFixed(2)}</span></div>
+          <div class="p-3 bg-slate-900 rounded">TP1<br><span class="font-bold text-lg">${tp1.toFixed(2)}</span></div>
+        </div>
+        <div class="mt-3">
+          <div class="w-full h-3 bg-slate-700 rounded-full mt-2 relative overflow-hidden">
+            <div style="width:${Math.min(100, (distance/Math.abs(tp1-stop))*100)+"%"}" class="h-full bg-emerald-500"></div>
+          </div>
+        </div>
+      </div>`;
+      document.getElementById('resultsArea').innerHTML = html;
+    });
+  </script>
+</body>
+</html>
